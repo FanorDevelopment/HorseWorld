@@ -6,14 +6,15 @@ public class PlayerController : MonoBehaviour {
 	Rigidbody rb;
 	public float speed;
 	Animator a;
-	bool idle;
-
+	bool run;
+	enum horseState {idle, move};
+	horseState currentState;
 
 	// Use this for initialization
 	void Start () {
 		rb = GetComponent<Rigidbody>();
 		a = GetComponent<Animator>();
-		idle = true;
+		currentState = horseState.idle;
 		}
 	
 	// Update is called once per frame
@@ -26,28 +27,31 @@ public class PlayerController : MonoBehaviour {
 	
 		transform.Translate(movement);
 
-		if (Input.GetKey (KeyCode.W) || Input.GetKey (KeyCode.S) || Input.GetKey (KeyCode.A) || Input.GetKey (KeyCode.D)) {
-			a.SetTrigger ("w");
-			idle = false;
-		} else {
+		Debug.Log (currentState);
+
+		if (Input.GetKey (KeyCode.W) || Input.GetKey (KeyCode.S) || Input.GetKey (KeyCode.A) || Input.GetKey (KeyCode.D))
+			currentState = horseState.move;	
+		else
+			currentState = horseState.idle;	
+
+		if (currentState == horseState.idle) {
 			a.SetTrigger ("i");
-			idle = true;
 		}
 
-		if(Input.GetKey(KeyCode.A))
-			transform.Rotate(Vector3.down * Time.deltaTime * 20);
-		if(Input.GetKey(KeyCode.D))
-			transform.Rotate(Vector3.up * Time.deltaTime * 20);
+		if (currentState == horseState.move) {
 
-		if (Input.GetKey (KeyCode.LeftShift) & !idle) {
-			speed = 0.2f;
-			a.SetTrigger ("r");
-		}
-			else
-			{
+			if(Input.GetKey(KeyCode.A))
+				transform.Rotate(Vector3.down * Time.deltaTime * 20);
+			if(Input.GetKey(KeyCode.D))
+				transform.Rotate(Vector3.up * Time.deltaTime * 20);
+
+			if (Input.GetKey (KeyCode.LeftShift)) {
+				speed = 0.2f;
+				a.SetTrigger ("r");
+			} else {
 				speed = 0.1f;
 				a.SetTrigger("w");
 			}
-
+		}
 	}
 }
